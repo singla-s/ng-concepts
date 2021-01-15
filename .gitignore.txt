@@ -1,3 +1,5 @@
 my-first-app/node_modules
 routing/node_modules
 services/node_modules
+node_modules
+d3js/node_modules
