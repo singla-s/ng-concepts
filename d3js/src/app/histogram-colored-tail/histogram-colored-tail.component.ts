@@ -1,3 +1,4 @@
+import { transformAll } from '@angular/compiler/src/render3/r3_ast';
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import { csv } from 'd3';
@@ -50,7 +51,7 @@ export class HistogramColoredTailComponent implements OnInit {
     
         // X axis: scale and draw:
         var xScale = d3.scaleLinear()
-          .domain([0, d3.max(data, d => d.weight)])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+          .domain([0, d3.max(data, d => d.horsepower)])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
           .range([0, innerWidth]);
 
         const xAxis = svg.append("g")
@@ -59,7 +60,7 @@ export class HistogramColoredTailComponent implements OnInit {
         xAxis.selectAll('.tick line').remove();
         // set the parameters for the histogram
         var histogram = d3.histogram()
-          .value(d => d.weight)   // I need to give the vector of value
+          .value(d => d.horsepower)   // I need to give the vector of value
           .domain(xScale.domain())  // then the domain of the graphic
           .thresholds(xScale.ticks(200)); // then the numbers of bins
 
@@ -74,8 +75,11 @@ export class HistogramColoredTailComponent implements OnInit {
         const yAxis = svg.append("g")
           .call(d3.axisLeft(yScale));
           yAxis.selectAll('.tick line').remove();
-        yAxis.append('g').append('text').attr('x',innerWidth).attr('y',0).
-          attr('text-anchor','end').attr('fill','black').text('hello');
+
+        const yAxisText = yAxis.append('g').append('text')
+          .attr('style','font-size: 1.5rem;')
+          .attr('x',-innerHeight/2).attr('y',0).attr('fill','black').text('hello');
+          yAxisText.attr('transform', `rotate(-90) translate(0,-20)`);
         // append the bar rectangles to the svg element
         svg.selectAll("rect")
           .data(bins)
@@ -85,7 +89,7 @@ export class HistogramColoredTailComponent implements OnInit {
             .attr("transform", function(d) { return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
             .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) -1 ; })
             .attr("height", function(d) { return innerHeight - yScale(d.length); })
-            .style("fill", function(d){ if(d.x0<140){return "orange"} else {return "#69b3a2"}})
+            .style("fill", function(d){ return "#69b3a2" })
 
         // Append a vertical line to highlight the separation
         svg
