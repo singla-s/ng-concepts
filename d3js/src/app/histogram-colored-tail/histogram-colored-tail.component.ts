@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
+import { csv } from 'd3';
 
 @Component({
   selector: 'app-histogram-colored-tail',
@@ -17,73 +18,90 @@ export class HistogramColoredTailComponent implements OnInit {
   drawHistogram() {
     // set the dimensions and margins of the graph
     var margin = {top: 10, right: 30, bottom: 30, left: 40},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    innerWidth = 960 - margin.left - margin.right,
+    innerHeight = 500 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("width", innerWidth + margin.left + margin.right)
+    .attr("height", innerHeight + margin.top + margin.bottom)
     .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-    // get the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv", function(data) {
+    //sample data structure
+      // acceleration: "12"
+      // cylinders: "8"
+      // displacement: "307"
+      // horsepower: "130"
+      // mpg: "18"
+      // name: "chevrolet chevelle malibu"
+      // origin: "USA"
+      // weight: "3504"
+      // year: "1970"
+      // get the data
+    csv('https://vizhub.com/curran/datasets/auto-mpg.csv').then( data => {
+      this.plotchart(data, svg, innerWidth, innerHeight)
+    })
+  }
 
-    // X axis: scale and draw:
-    var x = d3.scaleLinear()
-      .domain([0, 1000])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-      .range([0, width]);
-    svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+  plotchart(data, svg, innerWidth, innerHeight) {
+    
+        // X axis: scale and draw:
+        var xScale = d3.scaleLinear()
+          .domain([0, d3.max(data, d => d.weight)])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+          .range([0, innerWidth]);
 
-    // set the parameters for the histogram
-    var histogram = d3.histogram()
-      .value(function(d) { return d.price; })   // I need to give the vector of value
-      .domain(x.domain())  // then the domain of the graphic
-      .thresholds(x.ticks(70)); // then the numbers of bins
+        const xAxis = svg.append("g")
+          .attr("transform", "translate(0," + innerHeight + ")")
+          .call(d3.axisBottom(xScale));
+        xAxis.selectAll('.tick line').remove();
+        // set the parameters for the histogram
+        var histogram = d3.histogram()
+          .value(d => d.weight)   // I need to give the vector of value
+          .domain(xScale.domain())  // then the domain of the graphic
+          .thresholds(xScale.ticks(200)); // then the numbers of bins
 
-    // And apply this function to data to get the bins
-    var bins = histogram(data);
+        // And apply this function to data to get the bins
+        var bins = histogram(data);
 
-    // Y axis: scale and draw:
-    var y = d3.scaleLinear()
-      .range([height, 0]);
-      y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
-    svg.append("g")
-      .call(d3.axisLeft(y));
+        // Y axis: scale and draw:
+        var yScale = d3.scaleLinear()
+          .range([innerHeight, 0]);
+          yScale.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+        
+        const yAxis = svg.append("g")
+          .call(d3.axisLeft(yScale));
+          yAxis.selectAll('.tick line').remove();
+        yAxis.append('g').append('text').attr('x',innerWidth).attr('y',0).
+          attr('text-anchor','end').attr('fill','black').text('hello');
+        // append the bar rectangles to the svg element
+        svg.selectAll("rect")
+          .data(bins)
+          .enter()
+          .append("rect")
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; })
+            .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) -1 ; })
+            .attr("height", function(d) { return innerHeight - yScale(d.length); })
+            .style("fill", function(d){ if(d.x0<140){return "orange"} else {return "#69b3a2"}})
 
-    // append the bar rectangles to the svg element
-    svg.selectAll("rect")
-      .data(bins)
-      .enter()
-      .append("rect")
-        .attr("x", 1)
-        .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-        .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
-        .attr("height", function(d) { return height - y(d.length); })
-        .style("fill", function(d){ if(d.x0<140){return "orange"} else {return "#69b3a2"}})
-
-    // Append a vertical line to highlight the separation
-    svg
-    .append("line")
-      .attr("x1", x(140) )
-      .attr("x2", x(140) )
-      .attr("y1", y(0))
-      .attr("y2", y(1600))
-      .attr("stroke", "grey")
-      .attr("stroke-dasharray", "4")
-    svg
-    .append("text")
-    .attr("x", x(190))
-    .attr("y", y(1400))
-    .text("threshold: 140")
-    .style("font-size", "15px")
-
-    });
+        // Append a vertical line to highlight the separation
+        svg
+        .append("line")
+          .attr("x1", xScale(140) )
+          .attr("x2", xScale(140) )
+          .attr("y1", yScale(0))
+          .attr("y2", yScale(1600))
+          .attr("stroke", "grey")
+          .attr("stroke-dasharray", "4")
+        svg
+        .append("text")
+        .attr("x", xScale(190))
+        .attr("y", xScale(1400))
+        .text("threshold: 140")
+        .style("font-size", "15px")
   }
 
 }
