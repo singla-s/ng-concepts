@@ -120,5 +120,8 @@
       }
     }
   },
-  "defaultProject": "d3js"
+  "defaultProject": "d3js",
+  "cli": {
+    "analytics": false
+  }
 }
