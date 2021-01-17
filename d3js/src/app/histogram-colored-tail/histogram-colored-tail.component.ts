@@ -1,12 +1,13 @@
 import { transformAll } from '@angular/compiler/src/render3/r3_ast';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 import { csv } from 'd3';
 
 @Component({
   selector: 'app-histogram-colored-tail',
   templateUrl: './histogram-colored-tail.component.html',
-  styleUrls: ['./histogram-colored-tail.component.css']
+  styleUrls: ['./histogram-colored-tail.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class HistogramColoredTailComponent implements OnInit {
 
@@ -77,8 +78,12 @@ export class HistogramColoredTailComponent implements OnInit {
           yAxis.selectAll('.tick line').remove();
 
         const yAxisText = yAxis.append('g').append('text')
-          .attr('style','font-size: 1.5rem;')
-          .attr('x',-innerHeight/2).attr('y',0).attr('fill','black').text('hello');
+          .classed("text-label", true)
+          // .attr('style','font-size: 1.5rem;')
+          .attr('x',-innerHeight/2).attr('y',0)
+          .attr('fill','black')
+          .attr('text-anchor', 'middle')
+          .text('hello');
           yAxisText.attr('transform', `rotate(-90) translate(0,-20)`);
         // append the bar rectangles to the svg element
         svg.selectAll("rect")
