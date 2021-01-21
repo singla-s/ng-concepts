@@ -2,3 +2,5 @@ my-first-app/node_modules
 routing/node_modules
 services/node_modules
 d3js/node_modules
+ng-rxjs/node_modules
+ngmaterial/node_modules
