@@ -124,5 +124,8 @@
       }
     }
   },
-  "defaultProject": "ngmaterial"
+  "defaultProject": "ngmaterial",
+  "cli": {
+    "analytics": false
+  }
 }
