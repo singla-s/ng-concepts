@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { AppEventManagerService } from 'src/app/services';
 
 @Component({
   selector: 'app-user',
@@ -6,10 +7,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent implements OnInit {
-
-  constructor() { }
+  userName: string;
+  constructor(private eventManager: AppEventManagerService) { }
 
   ngOnInit(): void {
+  }
+
+  addUser() {
+    this.eventManager.broadcast({
+      name: "Add User",
+      userName: this.userName
+    })
   }
 
 }

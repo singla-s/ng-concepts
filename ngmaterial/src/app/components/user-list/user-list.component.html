@@ -1,1 +1,6 @@
-<p>user-list works!</p>
+<ul>
+    <li *ngFor="let user of users; index as i;">
+        <p>{{ user.id }} -- {{ user.name}}</p>
+        <app-remove-user [userid] = "user.id"></app-remove-user>
+    </li>
+</ul>

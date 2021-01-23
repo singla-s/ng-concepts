@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { AppEventManagerService } from 'src/app/services';
 
 @Component({
   selector: 'app-remove-user',
@@ -6,10 +7,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./remove-user.component.scss']
 })
 export class RemoveUserComponent implements OnInit {
-
-  constructor() { }
+  @Input("userid") userid: number;
+  constructor(private eventManager: AppEventManagerService) { }
 
   ngOnInit(): void {
+  }
+
+  removeUser(userid: number) {
+    this.eventManager.broadcast({
+      name: "Remove User",
+      id: userid
+    });
   }
 
 }

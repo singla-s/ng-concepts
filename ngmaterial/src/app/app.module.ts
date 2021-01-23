@@ -6,6 +6,7 @@ import { AppEventManagerService, AppStateService } from './services';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { UserComponent } from './components/user/user.component';
 import { RemoveUserComponent } from './components/remove-user/remove-user.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,7 @@ import { RemoveUserComponent } from './components/remove-user/remove-user.compon
     RemoveUserComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule, FormsModule
   ],
   providers: [AppEventManagerService, AppStateService],
   bootstrap: [AppComponent]
